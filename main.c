@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 {
   char *inputFileName;
   printf("argc = %d\n", argc);
-  FILE *inputFile;
+  FILE *inputFile, *outputFile;
   int width, height;
   char **Labirynt;
   char aux;
@@ -100,9 +100,10 @@ int main(int argc, char **argv)
   }
 
   inputFile = fopen(inputFileName, "r");
-  if (inputFile == NULL)
+  outputFile = fopen("output.txt", "w");
+  if (inputFile == NULL || outputFile == NULL)
   {
-    printf("Error: Could not open file %s\n", inputFileName);
+    printf("Error opening file\n");
     return 0;
   }
 
@@ -134,16 +135,23 @@ int main(int argc, char **argv)
 
   List *result = caminho(NULL, Labirynt, width, height, path, start, end, 0);
 
+  int count_paths = 0;
+  for (List *l = result; l != NULL; l = l->next)
+    count_paths++;
+
+  fprintf(outputFile, "%d\n", count_paths);
   for (List *l = result; l != NULL; l = l->next)
   {
+    fprintf(outputFile, "%d: ", l->length);
     for (int i = 0; i < l->length; i++)
     {
-      printf("(%d, %d) - ", l->path[i].width, l->path[i].height);
+      fprintf(outputFile, "%d %d ", l->path[i].height, l->path[i].width);
     }
-    printf("\n");
+    fprintf(outputFile, "\n");
   }
 
   fclose(inputFile);
+  fclose(outputFile);
   free_matrix(Labirynt, width);
 }
 
